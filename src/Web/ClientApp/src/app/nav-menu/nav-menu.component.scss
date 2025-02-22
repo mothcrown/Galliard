@@ -8,6 +8,10 @@ html {
   font-size: 14px;
 }
 
+nav {
+  background: linear-gradient(90deg, navy 1%, indigo 60%);
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;

@@ -1,7 +1,7 @@
 <header>
-  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
     <div class="container">
-      <a class="navbar-brand" [routerLink]="['/']">Galliard.Web</a>
+      <a class="navbar-brand text-white" [routerLink]="['/']"><i class="bi-moon-stars-fill"></i> Galliard</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -19,22 +19,7 @@
           <li class="nav-item"
               [routerLinkActive]="['link-active']"
               [routerLinkActiveOptions]="{ exact: true }">
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']">Counter</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']">Fetch data</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/todo']">Todo</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="/api" target="_blank">API</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="/Identity/Account/Manage">Account</a>
+            <a class="nav-link text-white" [routerLink]="['/']">Home</a>
           </li>
         </ul>
       </div>

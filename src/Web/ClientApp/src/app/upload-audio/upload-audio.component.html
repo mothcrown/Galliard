@@ -1,0 +1,14 @@
+<p>Drop the game session audio file</p>
+<div class="audio-file-upload-container" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+     (drop)="onDropSuccess($event)" [ngClass]="fileBeingDragged ? 'hover' : ''">
+  <div class="file-list">{{fileName}}</div>
+  <label class="audio-file-upload">
+    <input (change)="onChange($event)" type="file"/>
+  </label>
+</div>
+<br/>
+<div class="audio-file-upload-button">
+  <button class="btn btn-primary" [disabled]="!fileDragged">Upload!</button>
+</div>
+
+

@@ -1,0 +1,25 @@
+.audio-file-upload {
+  input {
+    display: none;
+  }
+}
+
+.audio-file-upload-container {
+  height: 300px;
+  border-radius: 20px;
+  border: 3px dimgrey dashed;
+
+  &.hover {
+    background-color: floralwhite;
+  }
+}
+
+.file-list {
+  padding: 5px;
+}
+
+.audio-file-upload-button {
+  display: flex;
+  flex-flow: row-reverse;
+}
+
