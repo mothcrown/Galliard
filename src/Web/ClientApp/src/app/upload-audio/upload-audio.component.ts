@@ -1,4 +1,5 @@
-import {Component, ElementRef} from '@angular/core';
+import {Component} from '@angular/core';
+import { FileStorageService } from "../services/file-storage.service";
 
 @Component({
   selector: 'app-upload-audio',
@@ -11,6 +12,8 @@ export class UploadAudioComponent {
   fileName: string;
   fileDragged: boolean = false;
   fileBeingDragged: boolean = false;
+
+  constructor(private fileStorageService: FileStorageService) {}
 
   onDragOver(event: any) {
     event.preventDefault();
@@ -33,8 +36,9 @@ export class UploadAudioComponent {
 
   private onFileChange(files: File[]) {
     // Let's ignore the other files for the moment, shall we?
-    let file: File = files[0];
+    let file = files[0];
     this.fileName = file.name;
     this.fileDragged = true;
+    this.fileStorageService.addFile(file);
   }
 }

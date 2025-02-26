@@ -1,4 +1,5 @@
 ﻿using Galliard.Application.Common.Models;
+using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace Galliard.Application.Common.Mappings;
 

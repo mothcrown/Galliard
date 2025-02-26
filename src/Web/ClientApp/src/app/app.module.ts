@@ -14,6 +14,9 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { UploadAudioComponent } from './upload-audio/upload-audio.component';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NovelizeProcessComponent } from "./novelize-process/novelize-process.component";
+import { FileStorageService } from "./services/file-storage.service";
+import { ProcessStageComponent } from "./process-stage/process-stage.component";
 
 @NgModule({
     declarations: [
@@ -22,21 +25,25 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         HomeComponent,
         CounterComponent,
         FetchDataComponent,
-        UploadAudioComponent
+        UploadAudioComponent,
+        NovelizeProcessComponent,
+        ProcessStageComponent
     ],
     bootstrap: [AppComponent],
     imports: [
         BrowserModule,
         FormsModule,
         RouterModule.forRoot([
-            { path: '', component: UploadAudioComponent, pathMatch: 'full' }
+            { path: '', component: UploadAudioComponent, pathMatch: 'full' },
+            { path: 'novelize', component: NovelizeProcessComponent }
         ]),
         BrowserAnimationsModule,
         ModalModule.forRoot()],
     providers: [
         { provide: APP_ID, useValue: 'ng-cli-universal' },
         { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true },
-        provideHttpClient(withInterceptorsFromDi())
+        provideHttpClient(withInterceptorsFromDi()),
+        FileStorageService
     ]
 })
 export class AppModule { }

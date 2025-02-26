@@ -1,0 +1,11 @@
+<div class="process-stage" [class.text-warning]="stage.loading" [class.text-success]="stage.success && !stage.loading"
+     [class.text-danger]="!stage.success && !stage.loading">
+  <h2>> {{stage.message}}</h2>
+  <div *ngIf="stage.loading;else finished">
+    <div class="spinner-border" role="status"></div>
+  </div>
+</div>
+
+<ng-template #finished>
+  <i [class.bi-check-lg]="stage.success" [class.x-circle]="!stage.success"></i>
+</ng-template>
