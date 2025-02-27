@@ -28,7 +28,10 @@ public static class DependencyInjection
         builder.Services.AddSingleton(TimeProvider.System);
         // builder.Services.AddTransient<IIdentityService, IdentityService>();
 
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR(o =>
+        {
+            o.EnableDetailedErrors = true;
+        });
         
         builder.Services.AddTransient<IFileService, FileService>();
         builder.Services.AddTransient<ITranscriptionService, TranscriptionService>();

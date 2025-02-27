@@ -1,5 +1,3 @@
-using Galliard.Infrastructure.Data;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -26,6 +24,10 @@ app.MapFallbackToFile("index.html");
 
 app.UseExceptionHandler(options => { });
 
+app.UseRouting();
+
+app.UseCors(builder =>
+    builder.WithOrigins("https://localhost:44447").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 
 app.MapEndpoints();
 

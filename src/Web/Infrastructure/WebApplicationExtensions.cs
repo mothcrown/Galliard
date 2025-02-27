@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Galliard.Infrastructure.Novelize;
 
 namespace Galliard.Web.Infrastructure;
 

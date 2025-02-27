@@ -9,8 +9,7 @@ public class Novelize : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .MapPost(NovelizeProcess)
-            .MapHub<NovelizeHub>("/NovelizeHub");
+            .MapPost(NovelizeProcess);
     }
 
     public async Task<Ok<string>> NovelizeProcess(ISender sender, NovelizeCommand command)

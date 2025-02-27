@@ -31,7 +31,7 @@ public class FileService(ILogger<FileService> logger, IConfiguration configurati
             await using FileStream fs = new(filePath, FileMode.Create, FileAccess.Write);
             await fs.WriteAsync(contents, 0, contents.Length);
             
-            await hubContext.Clients.All.SendAsync("UploadFile", uploadPath, uniqueFileName);
+            await hubContext.Clients.All.SendAsync("FileSaved", "OK");
             logger.LogInformation($"Audio {uniqueFileName} has been saved to {uploadPath}");
         }
         catch (Exception e)

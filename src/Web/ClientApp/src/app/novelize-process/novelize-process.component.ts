@@ -1,7 +1,9 @@
 import {Component} from '@angular/core';
 import { FileStorageService } from "../services/file-storage.service";
-import { NovelizeClient, NovelizeCommand } from "../web-api-client";
+import { NovelizeClient, NovelizeCommand, API_BASE_URL } from "../web-api-client";
 import { ProcessStage } from "../process-stage/process-stage";
+import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import * as signalR from '@microsoft/signalr';
 
 @Component({
   selector: 'app-novelize-process',
@@ -11,6 +13,7 @@ import { ProcessStage } from "../process-stage/process-stage";
 
 export class NovelizeProcessComponent {
 
+  private novelizeHub: HubConnection
   stages: ProcessStage[] = [];
 
   constructor(
@@ -19,8 +22,20 @@ export class NovelizeProcessComponent {
   ) {}
 
   ngOnInit() {
+    this.startHubConnection();
     this.sendFile();
+  }
 
+  private startHubConnection() {
+    console.log("Starting Hub connection...");
+    this.novelizeHub = new HubConnectionBuilder()
+      .withUrl('https://localhost:5001/NovelizeHub', {withCredentials: true})
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+    this.novelizeHub.start()
+      .then(() => console.log('connection started'))
+      .catch(err => console.log(err));
+    this.addListeners();
   }
 
   private sendFile() {
@@ -43,9 +58,14 @@ export class NovelizeProcessComponent {
       let subscription = novelizeClient.novelizeProcess(novelizeCommand).subscribe(
         result => {
           console.log(result);
-          this.stages[0].message = "Audio uploaded";
+          this.stages[0].message = "Audio saved";
           this.stages[0].loading = false;
           this.stages[0].success = true;
+          this.stages.push({
+            message: 'Transcribing audio...',
+            loading: true,
+            success: false
+          });
         },
         error => {
           console.error(error);
@@ -54,6 +74,25 @@ export class NovelizeProcessComponent {
         }
       );
     };
+  }
+
+  private addListeners() {
+    this.novelizeHub.on("AudioTranscribed", (message: string) => {
+      this.stages[1].message = "Audio transcribed";
+      this.stages[1].loading = false;
+      this.stages[1].success = true;
+      this.stages.push({
+        message: 'Novelizing transcription...',
+        loading: true,
+        success: false
+      });
+    });
+
+    this.novelizeHub.on("TranscriptionNovelized", (message: string) => {
+      this.stages[2].message = "Transcription novelized";
+      this.stages[2].loading = false;
+      this.stages[2].success = true;
+    })
   }
 
   private arrayBufferToBase64(buffer: ArrayBuffer) : string {
