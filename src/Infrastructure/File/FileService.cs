@@ -16,15 +16,7 @@ public class FileService(ILogger<FileService> logger, IConfiguration configurati
         string filePath;
         try
         {
-            var audioDir = configuration.GetValue<string>("File:AudiosDir");
-            string rootPath = environment.ContentRootPath;
-            var uploadPath = Path.Combine(rootPath, audioDir!);
-
-            if (!Directory.Exists(uploadPath))
-            {
-                Directory.CreateDirectory(uploadPath);
-            }
-        
+            var uploadPath = CreateDirectory(configuration.GetValue<string>("File:AudiosDir")!);
             string uniqueFileName = $"{Guid.NewGuid()}_{DateTime.Now:yyyyMMddHHmmss}_{fileName}";
             filePath = Path.Combine(uploadPath, uniqueFileName);
 
@@ -41,5 +33,18 @@ public class FileService(ILogger<FileService> logger, IConfiguration configurati
         }
 
         return filePath;
+    }
+
+    public string CreateDirectory(string dir)
+    {
+        string rootPath = environment.ContentRootPath;
+        var uploadPath = Path.Combine(rootPath, dir);
+
+        if (!Directory.Exists(uploadPath))
+        {
+            Directory.CreateDirectory(uploadPath);
+        }
+        
+        return uploadPath;
     }
 }

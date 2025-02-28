@@ -26,19 +26,25 @@ public class NovelizeCommandHandler : IRequestHandler<NovelizeCommand, string>
         _novelizeService = novelizeService;
     }
     
-    public async Task<string> Handle(NovelizeCommand request, CancellationToken cancellationToken)
+    public Task<string> Handle(NovelizeCommand request, CancellationToken cancellationToken)
+    {
+        FireAndForget(request);
+
+        // Smiley face
+        return Task.FromResult(":D");
+
+    }
+
+    private async void FireAndForget(NovelizeCommand request)
     {
         var filePath = await _fileService.SaveAudio(request.FileName!, Convert.FromBase64String(request.Contents!.Split(',')[1]));
         _logger.LogInformation($"Audio saved: {filePath}");
         
-        // var transcriptedFile = await _transcriptionService.Transcribe(filePath!);
-        // _logger.LogInformation($"Transcription saved: {transcriptedFile}");
-        //
+        // User is safe to disconnect
+        var transcriptedFile = await _transcriptionService.Transcribe(filePath!);
+        _logger.LogInformation($"Transcription saved: {transcriptedFile}");
+        
         // var novelization = await _novelizeService.Novelize(transcriptedFile);
         // _logger.LogInformation($"Novelized text saved: {novelization}");
-
-        // Smiley face
-        return ":D";
-
     }
 }
