@@ -46,6 +46,8 @@
 
     <ItemGroup>
       <Folder Include="Uploads\Audios\" />
+      <Folder Include="Uploads\Novelizations\" />
+      <Folder Include="Uploads\Transcriptions\" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

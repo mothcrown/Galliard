@@ -9,23 +9,14 @@ public record NovelizeCommand : IRequest<string>
     public string? Contents { get; set; }
 }
 
-public class NovelizeCommandHandler : IRequestHandler<NovelizeCommand, string>
+public class NovelizeCommandHandler(
+    ILogger<NovelizeCommandHandler> logger,
+    IFileService fileService,
+    ITranscriptionService transcriptionService,
+    INovelizeService novelizeService,
+    INovelizeHubService novelizeHubService)
+    : IRequestHandler<NovelizeCommand, string>
 {
-    private readonly ILogger<NovelizeCommandHandler> _logger;
-    private readonly IFileService _fileService;
-    private readonly ITranscriptionService _transcriptionService;
-    private readonly INovelizeService _novelizeService;
-
-
-    public NovelizeCommandHandler(ILogger<NovelizeCommandHandler> logger, IFileService fileService,
-        ITranscriptionService transcriptionService, INovelizeService novelizeService)
-    {
-        _logger = logger;
-        _fileService = fileService;
-        _transcriptionService = transcriptionService;
-        _novelizeService = novelizeService;
-    }
-    
     public Task<string> Handle(NovelizeCommand request, CancellationToken cancellationToken)
     {
         FireAndForget(request);
@@ -37,14 +28,75 @@ public class NovelizeCommandHandler : IRequestHandler<NovelizeCommand, string>
 
     private async void FireAndForget(NovelizeCommand request)
     {
-        var filePath = await _fileService.SaveAudio(request.FileName!, Convert.FromBase64String(request.Contents!.Split(',')[1]));
-        _logger.LogInformation($"Audio saved: {filePath}");
-        
-        // User is safe to disconnect
-        var transcriptedFile = await _transcriptionService.Transcribe(filePath!);
-        _logger.LogInformation($"Transcription saved: {transcriptedFile}");
-        
-        // var novelization = await _novelizeService.Novelize(transcriptedFile);
-        // _logger.LogInformation($"Novelized text saved: {novelization}");
+        var filePath = await SaveAudio(request);
+        var transcriptedFilePath = await TranscribeAudio(filePath);
+        var novelization = await Novelize(transcriptedFilePath);
+    }
+
+    private async Task<string?> SaveAudio(NovelizeCommand request)
+    {
+        string? filePath;
+        string hubMessage = "ERROR";
+        try
+        {
+            filePath = await fileService.SaveAudio(request.FileName!,
+                Convert.FromBase64String(request.Contents!.Split(',')[1]));
+            hubMessage = "OK";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error: {ex.Message}");
+            throw;
+        }
+        finally
+        {
+            novelizeHubService.UpdateProcessStage("FileSaved", hubMessage);
+        }
+
+        return filePath;
+    }
+    
+    private async Task<string?> TranscribeAudio(string? audioFilePath)
+    {
+        string? transcriptedFilePath;
+        string hubMessage = "ERROR";
+        try
+        {
+            transcriptedFilePath = await transcriptionService.Transcribe(audioFilePath!);
+            hubMessage = "OK";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error: {ex.Message}");
+            throw;
+        }
+        finally
+        {
+            novelizeHubService.UpdateProcessStage("AudioTranscribed", hubMessage);
+        }
+
+        return transcriptedFilePath;
+    }
+    
+    private async Task<string?> Novelize(string? transcriptedFilePath)
+    {
+        string? novelizationFilePath;
+        string hubMessage = "ERROR";
+        try
+        {
+            novelizationFilePath = await novelizeService.Novelize(transcriptedFilePath!);
+            hubMessage = "OK";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error: {ex.Message}");
+            throw;
+        }
+        finally
+        {
+            novelizeHubService.UpdateProcessStage("TranscriptionNovelized", hubMessage);
+        }
+
+        return novelizationFilePath;
     }
 }

@@ -78,20 +78,31 @@ export class NovelizeProcessComponent {
 
   private addListeners() {
     this.novelizeHub.on("AudioTranscribed", (message: string) => {
-      this.stages[1].message = "Audio transcribed";
-      this.stages[1].loading = false;
-      this.stages[1].success = true;
-      this.stages.push({
-        message: 'Novelizing transcription...',
-        loading: true,
-        success: false
-      });
+      if (message == "OK") {
+        this.stages[1].message = "Audio transcribed";
+        this.stages[1].loading = false;
+        this.stages[1].success = true;
+        this.stages.push({
+          message: 'Novelizing transcription...',
+          loading: true,
+          success: false
+        });
+      } else {
+        this.stages[1].loading = false;
+        this.stages[1].success = false;
+      }
+
     });
 
     this.novelizeHub.on("TranscriptionNovelized", (message: string) => {
-      this.stages[2].message = "Transcription novelized";
-      this.stages[2].loading = false;
-      this.stages[2].success = true;
+      if (message == "OK") {
+        this.stages[2].message = "Transcription novelized";
+        this.stages[2].loading = false;
+        this.stages[2].success = true;
+      } else {
+        this.stages[2].loading = false;
+        this.stages[2].success = false;
+      }
     })
   }
 

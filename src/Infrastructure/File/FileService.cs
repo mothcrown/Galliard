@@ -1,15 +1,11 @@
 using Galliard.Application.Common.Interfaces;
-using Galliard.Infrastructure.Novelize;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Galliard.Infrastructure.File;
 
-public class FileService(ILogger<FileService> logger, IConfiguration configuration, IWebHostEnvironment environment,
-    IHubContext<NovelizeHub> hubContext) : IFileService
+public class FileService(ILogger<FileService> logger, IConfiguration configuration, IWebHostEnvironment environment) : IFileService
 {
     public async Task<string?> SaveAudio(string fileName, byte[] contents)
     {
@@ -23,8 +19,26 @@ public class FileService(ILogger<FileService> logger, IConfiguration configurati
             await using FileStream fs = new(filePath, FileMode.Create, FileAccess.Write);
             await fs.WriteAsync(contents, 0, contents.Length);
             
-            await hubContext.Clients.All.SendAsync("FileSaved", "OK");
             logger.LogInformation($"Audio {uniqueFileName} has been saved to {uploadPath}");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            throw;
+        }
+
+        return filePath;
+    }
+
+    public async Task<string?> SaveNovelization(string fileName, string novelization)
+    {
+        string filePath;
+        try
+        {
+            var uploadPath = CreateDirectory(configuration.GetValue<string>("File:NovelizationsDir")!);
+            filePath = Path.Combine(uploadPath, fileName);
+            await System.IO.File.WriteAllTextAsync(filePath, novelization);
+            logger.LogInformation($"Novelization saved to {filePath}");
         }
         catch (Exception e)
         {
@@ -46,5 +60,10 @@ public class FileService(ILogger<FileService> logger, IConfiguration configurati
         }
         
         return uploadPath;
+    }
+
+    public async Task<string> ReadTranscription(string transcriptionFilePath)
+    {
+        return await System.IO.File.ReadAllTextAsync(transcriptionFilePath);
     }
 }

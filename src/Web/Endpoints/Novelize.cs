@@ -1,6 +1,7 @@
 using Galliard.Application.Novelize.Commands.Novelize;
 using Galliard.Infrastructure.Novelize;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Galliard.Web.Endpoints;
 
@@ -12,6 +13,7 @@ public class Novelize : EndpointGroupBase
             .MapPost(NovelizeProcess);
     }
 
+    [DisableRequestSizeLimit]
     public async Task<Ok<string>> NovelizeProcess(ISender sender, NovelizeCommand command)
     {
         return TypedResults.Ok(await sender.Send(command));

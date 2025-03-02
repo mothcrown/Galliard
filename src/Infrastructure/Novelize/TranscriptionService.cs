@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace Galliard.Infrastructure.Novelize;
 
 public class TranscriptionService(ILogger<TranscriptionService> logger, IConfiguration configuration,
-    IHubContext<NovelizeHub> hubContext, IFileService fileService) : ITranscriptionService
+    IFileService fileService) : ITranscriptionService
 {
     public async Task<string> Transcribe(string audioFilePath)
     {
@@ -21,15 +21,14 @@ public class TranscriptionService(ILogger<TranscriptionService> logger, IConfigu
             var startInfo = new ProcessStartInfo();
             startInfo.FileName = configuration.GetValue<string>("Whisper");
             startInfo.CreateNoWindow = true;
-            startInfo.Arguments = $"--language es --output_dir {uploadPath} --output_format srt {audioFilePath}";
+            startInfo.Arguments = $"--language es --output_dir {uploadPath} --output_format txt {audioFilePath}";
             Console.WriteLine($"Starting transcription process: {startInfo.Arguments}");
             transcriptionProcess.StartInfo = startInfo;
             transcriptionProcess.Start();
             await transcriptionProcess.WaitForExitAsync();
 
-            var fileName = audioFilePath.Split('\\').Last().Split('.').First() + ".srt";
+            var fileName = audioFilePath.Split('\\').Last().Split('.').First() + ".txt";
             filePath = Path.Combine(uploadPath, fileName);
-            await hubContext.Clients.All.SendAsync("AudioTranscribed", "OK");
             logger.LogInformation($"Audio has been transcribed to {filePath}");
         }
         catch (Exception e)

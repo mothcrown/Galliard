@@ -29,6 +29,9 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.AI" Version="9.3.0-preview.1.25114.11" />
+    <PackageVersion Include="Microsoft.Extensions.AI.Ollama" Version="9.3.0-preview.1.25114.11" />
+    <PackageVersion Include="OllamaSharp" Version="5.1.2" />
     <PackageVersion Include="Testcontainers.MsSql" Version="4.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />

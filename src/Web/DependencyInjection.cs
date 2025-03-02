@@ -2,6 +2,7 @@
 using Galliard.Application.Common.Interfaces;
 using Galliard.Infrastructure.Data;
 using Galliard.Web.Services;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -12,6 +13,7 @@ public static class DependencyInjection
     public static void AddWebServices(this IHostApplicationBuilder builder)
     {
         builder.Services.AddCors();
+        
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddScoped<IUser, CurrentUser>();
