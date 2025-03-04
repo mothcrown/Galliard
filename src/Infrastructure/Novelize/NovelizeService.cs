@@ -8,20 +8,28 @@ namespace Galliard.Infrastructure.Novelize;
 public class NovelizeService(ILogger<TranscriptionService> logger, IConfiguration configuration,
     IFileService fileService) : INovelizeService
 {
+    private const int MAX_BLOCK_SIZE = 2000;
+    
     public async Task<string> Novelize(string transcriptionFilePath)
     {
         var ollama = new OllamaApiClient(new Uri(configuration.GetValue<string>("Ollama:Url")!));
         ollama.SelectedModel = configuration.GetValue<string>("Ollama:Model")!;
-
-        var prompt =
-            "Eres un escritor amigo de un grupo de jugadores de rol que están jugando a una partida ambientada en la antigua Roma, ellos te han dado una transcripción de su última partida y te han pedido por favor que la resumas evitando escenas de violencia gratuitas. Es muy importante ignorar discusiones sobre reglas del juego o comentarios fuera de personaje, no te inventes nada que no aparezca en el texto! Aquí te pasamos la transcripción, responde directamente con su resumen: ";
         
-        prompt += await fileService.ReadTranscription(transcriptionFilePath);
+        var fullTranscription = await fileService.ReadTranscription(transcriptionFilePath);
+        List<string> storyBlocks = SplitTranscription(fullTranscription);
+        var blockLength = storyBlocks.Count;
+        
         logger.LogInformation("Starting novelization...");
         string novelization = "";
-        await foreach (var stream in ollama.GenerateAsync(prompt))
+        for (int i = 0; i < blockLength; i++)
         {
-            novelization += stream!.Response;
+            await foreach (var stream in ollama.GenerateAsync(storyBlocks[i]))
+            {
+                novelization += stream!.Response;
+            }
+
+            novelization += Environment.NewLine;
+            logger.LogInformation($"Story block: {i + 1}/{blockLength}");
         }
         
         var fileName = transcriptionFilePath.Split('\\').Last().Split('.').First() + ".txt";
@@ -29,5 +37,27 @@ public class NovelizeService(ILogger<TranscriptionService> logger, IConfiguratio
         logger.LogInformation($"Novelization done: {filePath}");
 
         return filePath!;
+    }
+
+    private List<string> SplitTranscription(string fullTranscription)
+    {
+        List<string> result = [];
+        int start = 0;
+
+        while (start < fullTranscription.Length)
+        {
+            int end = Math.Min(start + MAX_BLOCK_SIZE, fullTranscription.Length);
+            
+            int lastNewline = fullTranscription.LastIndexOf('\n', end - 1, end - start);
+            if (lastNewline == -1 || lastNewline <= start)
+            {
+                lastNewline = end;
+            }
+            
+            result.Add(fullTranscription.Substring(start, lastNewline - start));
+            start = lastNewline;
+        }
+        
+        return result;
     }
 }
