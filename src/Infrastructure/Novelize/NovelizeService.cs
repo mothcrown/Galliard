@@ -8,14 +8,14 @@ namespace Galliard.Infrastructure.Novelize;
 public class NovelizeService(ILogger<TranscriptionService> logger, IConfiguration configuration,
     IFileService fileService) : INovelizeService
 {
-    private const int MAX_BLOCK_SIZE = 2000;
+    private const int MAX_BLOCK_SIZE = 3000;
     
     public async Task<string> Novelize(string transcriptionFilePath)
     {
         var ollama = new OllamaApiClient(new Uri(configuration.GetValue<string>("Ollama:Url")!));
         ollama.SelectedModel = configuration.GetValue<string>("Ollama:Model")!;
         
-        var fullTranscription = await fileService.ReadTranscription(transcriptionFilePath);
+        var fullTranscription = await fileService.ReadTextFile(transcriptionFilePath);
         List<string> storyBlocks = SplitTranscription(fullTranscription);
         var blockLength = storyBlocks.Count;
         

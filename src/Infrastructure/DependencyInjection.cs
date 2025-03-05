@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Google;
 using Microsoft.Extensions.DependencyInjection.Hub;
 using Microsoft.Extensions.Hosting;
 
@@ -34,6 +35,7 @@ public static class DependencyInjection
             o.EnableDetailedErrors = true;
         });
         
+        builder.Services.AddTransient<IGoogleDriveService, GoogleDriveService>();
         builder.Services.AddTransient<INovelizeHubService, NovelizeHubService>();
         builder.Services.AddTransient<IFileService, FileService>();
         builder.Services.AddTransient<ITranscriptionService, TranscriptionService>();

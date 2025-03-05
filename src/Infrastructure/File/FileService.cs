@@ -62,8 +62,8 @@ public class FileService(ILogger<FileService> logger, IConfiguration configurati
         return uploadPath;
     }
 
-    public async Task<string> ReadTranscription(string transcriptionFilePath)
+    public async Task<string> ReadTextFile(string filepath)
     {
-        return await System.IO.File.ReadAllTextAsync(transcriptionFilePath);
+        return await System.IO.File.ReadAllTextAsync(filepath);
     }
 }

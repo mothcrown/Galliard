@@ -7,6 +7,10 @@
 
     <ItemGroup>
         <PackageReference Include="Azure.Identity"/>
+        <PackageReference Include="Google.Apis" />
+        <PackageReference Include="Google.Apis.Auth" />
+        <PackageReference Include="Google.Apis.Docs.v1" />
+        <PackageReference Include="Google.Apis.Drive.v3" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI"/>

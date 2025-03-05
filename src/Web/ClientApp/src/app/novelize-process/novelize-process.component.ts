@@ -99,9 +99,25 @@ export class NovelizeProcessComponent {
         this.stages[2].message = "Transcription novelized";
         this.stages[2].loading = false;
         this.stages[2].success = true;
+        this.stages.push({
+          message: 'Uploading novelization to Google Drive...',
+          loading: true,
+          success: false
+        });
       } else {
         this.stages[2].loading = false;
         this.stages[2].success = false;
+      }
+    });
+
+    this.novelizeHub.on("UploadedGoogleDrive", (message: string) => {
+      if (message == "OK") {
+        this.stages[3].message = "Novelization uploaded to Google Drive";
+        this.stages[3].loading = false;
+        this.stages[3].success = true;
+      } else {
+        this.stages[3].loading = false;
+        this.stages[3].success = false;
       }
     })
   }

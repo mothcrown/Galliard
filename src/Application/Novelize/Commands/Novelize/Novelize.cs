@@ -14,7 +14,8 @@ public class NovelizeCommandHandler(
     IFileService fileService,
     ITranscriptionService transcriptionService,
     INovelizeService novelizeService,
-    INovelizeHubService novelizeHubService)
+    INovelizeHubService novelizeHubService,
+    IGoogleDriveService googleDriveService)
     : IRequestHandler<NovelizeCommand, string>
 {
     public Task<string> Handle(NovelizeCommand request, CancellationToken cancellationToken)
@@ -30,7 +31,8 @@ public class NovelizeCommandHandler(
     {
         var filePath = await SaveAudio(request);
         var transcriptedFilePath = await TranscribeAudio(filePath);
-        var novelization = await Novelize(transcriptedFilePath);
+        var novelizationFilePath = await Novelize(transcriptedFilePath);
+        var googleDriveDocumentId = await UploadToGoogleDrive(novelizationFilePath);
     }
 
     private async Task<string?> SaveAudio(NovelizeCommand request)
@@ -98,5 +100,27 @@ public class NovelizeCommandHandler(
         }
 
         return novelizationFilePath;
+    }
+    
+    private async Task<string> UploadToGoogleDrive(string? novelizationFilePath)
+    {
+        string? googleDriveDocumentId;
+        string hubMessage = "ERROR";
+        try
+        {
+            googleDriveDocumentId = await googleDriveService.UploadNovelization(novelizationFilePath!);
+            hubMessage = "OK";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error: {ex.Message}");
+            throw;
+        }
+        finally
+        {
+            novelizeHubService.UpdateProcessStage("UploadedGoogleDrive", hubMessage);
+        }
+
+        return googleDriveDocumentId;
     }
 }
